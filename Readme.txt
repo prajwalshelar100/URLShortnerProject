@@ -31,4 +31,4 @@ This application uses the TinyURL API to shorten URLs. Ensure an active internet
 License
 This project is licensed under the MIT License.
 
-Program is present at :C:\Users\prajw\OneDrive\Desktop\Task3\ShortURL\ShortURL\src\main\java\com\mycompany\shorturl\ShortURL.java
+Program is present at :src\main\java\com\mycompany\shorturl\ShortURL.java
