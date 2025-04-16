@@ -17,6 +17,7 @@ public class ShortURL {
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private static final Color TEXT_COLOR = new Color(44, 62, 80);
+    private static final Color FOOTER_COLOR = new Color(236, 240, 241);
 
     private JFrame frame;
     private JTextField originalUrlField;
@@ -55,13 +56,18 @@ public class ShortURL {
     private void initialize() {
         frame = new JFrame("URL Shortener");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 300);
+        frame.setSize(700, 350);
         frame.setLocationRelativeTo(null);
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
 
-        JPanel mainPanel = new JPanel(new GridBagLayout());
+        // Main content panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
-        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        // Content panel
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(BACKGROUND_COLOR);
+        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -74,7 +80,7 @@ public class ShortURL {
         JLabel titleLabel = new JLabel("URL Shortener");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(PRIMARY_COLOR);
-        mainPanel.add(titleLabel, gbc);
+        contentPanel.add(titleLabel, gbc);
 
         // Original URL
         gbc.gridy = 1;
@@ -82,26 +88,26 @@ public class ShortURL {
         JLabel lblOriginalUrl = new JLabel("Original URL:");
         lblOriginalUrl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblOriginalUrl.setForeground(TEXT_COLOR);
-        mainPanel.add(lblOriginalUrl, gbc);
+        contentPanel.add(lblOriginalUrl, gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         originalUrlField = createStyledTextField();
-        mainPanel.add(originalUrlField, gbc);
+        contentPanel.add(originalUrlField, gbc);
 
         // Shorten Button
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.0;
         btnShorten = createStyledButton("Shorten URL");
-        mainPanel.add(btnShorten, gbc);
+        contentPanel.add(btnShorten, gbc);
 
         // Shortened URL
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         shortUrlField = createStyledTextField();
         shortUrlField.setEditable(false);
-        mainPanel.add(shortUrlField, gbc);
+        contentPanel.add(shortUrlField, gbc);
 
         // Status Label
         gbc.gridx = 0;
@@ -111,7 +117,21 @@ public class ShortURL {
         statusLabel = new JLabel(" ");
         statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mainPanel.add(statusLabel, gbc);
+        contentPanel.add(statusLabel, gbc);
+
+        // Footer Panel
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        footerPanel.setBackground(FOOTER_COLOR);
+        footerPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        
+        JLabel footerLabel = new JLabel("@2024 Prajwal Shelar. All rights reserved.");
+        footerLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        footerLabel.setForeground(TEXT_COLOR);
+        footerPanel.add(footerLabel);
+
+        // Add panels to main panel
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(footerPanel, BorderLayout.SOUTH);
 
         btnShorten.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
