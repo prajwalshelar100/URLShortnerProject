@@ -8,6 +8,8 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import javax.swing.border.EmptyBorder;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
 public class ShortURL {
 
@@ -18,11 +20,13 @@ public class ShortURL {
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private static final Color TEXT_COLOR = new Color(44, 62, 80);
     private static final Color FOOTER_COLOR = new Color(236, 240, 241);
+    private static final Color SUCCESS_COLOR = new Color(39, 174, 96);
 
     private JFrame frame;
     private JTextField originalUrlField;
     private JTextField shortUrlField;
     private JButton btnShorten;
+    private JButton btnCopy;
     private JLabel statusLabel;
 
     public static void main(String[] args) {
@@ -102,12 +106,19 @@ public class ShortURL {
         btnShorten = createStyledButton("Shorten URL");
         contentPanel.add(btnShorten, gbc);
 
-        // Shortened URL
+        // Shortened URL with Copy Button
         gbc.gridx = 1;
         gbc.weightx = 1.0;
+        JPanel urlPanel = new JPanel(new BorderLayout());
+        urlPanel.setOpaque(false);
         shortUrlField = createStyledTextField();
         shortUrlField.setEditable(false);
-        contentPanel.add(shortUrlField, gbc);
+        urlPanel.add(shortUrlField, BorderLayout.CENTER);
+        
+        btnCopy = createCopyButton();
+        urlPanel.add(btnCopy, BorderLayout.EAST);
+        
+        contentPanel.add(urlPanel, gbc);
 
         // Status Label
         gbc.gridx = 0;
@@ -140,6 +151,50 @@ public class ShortURL {
         });
 
         frame.add(mainPanel);
+    }
+
+    private JButton createCopyButton() {
+        JButton button = new JButton("Copy") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getModel().isPressed() ? SECONDARY_COLOR.darker() : SECONDARY_COLOR);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+        };
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setPreferredSize(new Dimension(80, 40));
+        button.setEnabled(false);
+        
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String url = shortUrlField.getText();
+                if (!url.isEmpty()) {
+                    StringSelection selection = new StringSelection(url);
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(selection, selection);
+                    statusLabel.setText("URL copied to clipboard!");
+                    statusLabel.setForeground(SUCCESS_COLOR);
+                    
+                    // Reset status message after 2 seconds
+                    Timer timer = new Timer(2000, ev -> {
+                        statusLabel.setText(" ");
+                    });
+                    timer.setRepeats(false);
+                    timer.start();
+                }
+            }
+        });
+        
+        return button;
     }
 
     private JTextField createStyledTextField() {
@@ -207,14 +262,17 @@ public class ShortURL {
             if (shortenedUrl != null) {
                 shortUrlField.setText(shortenedUrl);
                 statusLabel.setText("URL shortened successfully!");
-                statusLabel.setForeground(new Color(39, 174, 96));
+                statusLabel.setForeground(SUCCESS_COLOR);
+                btnCopy.setEnabled(true);
             } else {
                 statusLabel.setText("Failed to shorten URL. Please try again.");
                 statusLabel.setForeground(Color.RED);
+                btnCopy.setEnabled(false);
             }
         } catch (Exception e) {
             statusLabel.setText("Error: " + e.getMessage());
             statusLabel.setForeground(Color.RED);
+            btnCopy.setEnabled(false);
         } finally {
             btnShorten.setEnabled(true);
         }
